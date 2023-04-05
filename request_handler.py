@@ -2,7 +2,8 @@ import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from views import get_all_animals, get_single_animal, get_single_location, get_all_locations
 from views import get_single_customer, get_all_customers, get_all_employees, get_single_employee
-from views import create_animal, create_location, create_employee, create_customer
+from views import create_animal, create_location, create_employee, create_customer, delete_animal
+from views import delete_employee, delete_customer, delete_location
 # Here's a class. It inherits from another class.
 # For now, think of a class as a container for functions that
 # work together for a common purpose. In this case, that
@@ -107,6 +108,30 @@ class HandleRequests(BaseHTTPRequestHandler):
     def do_PUT(self):
         """Handles PUT requests to the server"""
         self.do_PUT()
+
+    def do_DELETE(self):
+        """function for removing animal from database"""
+        # Set a 204 response code
+        self._set_headers(204)
+
+        # Parse the URL
+        (resource, id) = self.parse_url(self.path)
+
+        # Delete a single animal from the list
+        if resource == "animals":
+            delete_animal(id)
+
+        # Encode the new animal and send in response
+            self.wfile.write("".encode())
+        if resource == "locations":
+            delete_location(id)
+            self.wfile.write("".encode())
+        if resource == "customers":
+            delete_customer(id)
+            self.wfile.write("".encode())
+        if resource == "employees":
+            delete_employee(id)
+            self.wfile.write("".encode())
 
     def _set_headers(self, status):
         # Notice this Docstring also includes information about the arguments passed to the function
