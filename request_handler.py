@@ -3,7 +3,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from views import get_all_animals, get_single_animal, get_single_location, get_all_locations
 from views import get_single_customer, get_all_customers, get_all_employees, get_single_employee
 from views import create_animal, create_location, create_employee, create_customer, delete_animal
-from views import delete_employee, delete_customer, delete_location
+from views import delete_employee, delete_customer, delete_location, update_animal, update_employee, update_customer, update_location
 # Here's a class. It inherits from another class.
 # For now, think of a class as a container for functions that
 # work together for a common purpose. In this case, that
@@ -107,7 +107,24 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def do_PUT(self):
         """Handles PUT requests to the server"""
-        self.do_PUT()
+        # self.do_PUT()
+        self._set_headers(204)
+        content_len = int(self.headers.get('content-length', 0))
+        post_body = self.rfile.read(content_len)
+        post_body = json.loads(post_body)
+        (resource, id) = self.parse_url(self.path)
+        if resource == "animals":
+            update_animal(id, post_body)
+            self.wfile.write("".encode())
+        if resource == "locations":
+            update_location(id, post_body)
+            self.wfile.write("".encode())
+        if resource == "customers":
+            update_customer(id, post_body)
+            self.wfile.write("".encode())
+        if resource == "employees":
+            update_employee(id, post_body)
+            self.wfile.write("".encode())
 
     def do_DELETE(self):
         """function for removing animal from database"""
