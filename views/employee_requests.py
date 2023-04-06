@@ -20,7 +20,7 @@ def get_single_employee(id):
     return requested_employee
 
 def create_employee(employee):
-    """function for creating an employee"""
+    """function for adding an employee to the database"""
     # Get the id value of the last employee in the list
     max_id = EMPLOYEES[-1]["id"]
 
