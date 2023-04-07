@@ -37,6 +37,8 @@ class HandleRequests(BaseHTTPRequestHandler):
             if response is None:
                 self._set_headers(404)
                 response = {"message": f"Animal {id} is not found"}
+            else:
+                self._set_headers(200)
         if resource == "locations":
             if id is not None:
                 response = get_single_location(id)
@@ -45,6 +47,8 @@ class HandleRequests(BaseHTTPRequestHandler):
             if response is None:
                 self._set_headers(404)
                 response = {"message": f"Location {id} is not found"}
+            else:
+                self._set_headers(200)
         if resource == "customers":
             if id is not None:
                 response = get_single_customer(id)
@@ -53,6 +57,8 @@ class HandleRequests(BaseHTTPRequestHandler):
             if response is None:
                 self._set_headers(404)
                 response = {"message": f"Customer {id} is not found"}
+            else:
+                self._set_headers(200)
         if resource == "employees":
             if id is not None:
                 response = get_single_employee(id)
@@ -61,8 +67,10 @@ class HandleRequests(BaseHTTPRequestHandler):
             if response is None:
                 self._set_headers(404)
                 response = {"message": f"Employee {id} is not found"}
-        if response is not None:
-            self._set_headers(200)
+            else:
+                self._set_headers(200)
+        # if response is not None:
+        #     self._set_headers(200)
         self.wfile.write(json.dumps(response).encode())
 
     # Here's a method on the class that overrides the parent's method.
@@ -169,27 +177,30 @@ class HandleRequests(BaseHTTPRequestHandler):
     def do_DELETE(self):
         """function for removing animal from database"""
         # Set a 204 response code
-        self._set_headers(204)
+        # self._set_headers(204)
 
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
         # Delete a single animal from the list
         if resource == "animals":
+            self._set_headers(204)
             delete_animal(id)
-
         # Encode the new animal and send in response
             self.wfile.write("".encode())
         if resource == "locations":
             delete_location(id)
+            self._set_headers(204)
             self.wfile.write("".encode())
         if resource == "customers":
-            delete_customer(id)
-            self.wfile.write("".encode())
+            # delete_customer(id)
+            self._set_headers(405)
+            response = {"message": "Deleting customers requires contacting the company directly"}
+            self.wfile.write(json.dumps(response).encode())
         if resource == "employees":
             delete_employee(id)
+            self._set_headers(204)
             self.wfile.write("".encode())
-
     def _set_headers(self, status):
         # Notice this Docstring also includes information about the arguments passed to the function
         """Sets the status code, Content-Type and Access-Control-Allow-Origin
