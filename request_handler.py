@@ -29,13 +29,14 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         # Parse the URL and capture the tuple that is returned
         (resource, id) = self.parse_url(self.path)
-
         if resource == "animals":
             if id is not None:
                 response = get_single_animal(id)
-
             else:
                 response = get_all_animals()
+            if response is None:
+                self._set_headers(404)
+                response = {"message": f"Animal {id} is not found"}
         if resource == "locations":
             if id is not None:
                 response = get_single_location(id)
@@ -51,7 +52,6 @@ class HandleRequests(BaseHTTPRequestHandler):
                 response = get_single_employee(id)
             else:
                 response = get_all_employees()
-
         self.wfile.write(json.dumps(response).encode())
 
     # Here's a method on the class that overrides the parent's method.

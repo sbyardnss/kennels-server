@@ -50,6 +50,8 @@ def get_single_animal(id):
             requested_animal = animal
             requested_animal["location"] = get_single_location(animal["locationId"])
             requested_animal["customer"] = get_single_customer(animal["customerId"])
+            requested_animal.pop("locationId", None)
+            requested_animal.pop("customerId", None)
     return requested_animal
 
 
