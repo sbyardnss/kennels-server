@@ -24,7 +24,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         """Handles GET requests to the server
         """
         # Set the response code to 'Ok'
-        self._set_headers(200)
+        # self._set_headers(200)
         response = {}  # Default response
 
         # Parse the URL and capture the tuple that is returned
@@ -42,16 +42,27 @@ class HandleRequests(BaseHTTPRequestHandler):
                 response = get_single_location(id)
             else:
                 response = get_all_locations()
+            if response is None:
+                self._set_headers(404)
+                response = {"message": f"Location {id} is not found"}
         if resource == "customers":
             if id is not None:
                 response = get_single_customer(id)
             else:
                 response = get_all_customers()
+            if response is None:
+                self._set_headers(404)
+                response = {"message": f"Customer {id} is not found"}
         if resource == "employees":
             if id is not None:
                 response = get_single_employee(id)
             else:
                 response = get_all_employees()
+            if response is None:
+                self._set_headers(404)
+                response = {"message": f"Employee {id} is not found"}
+        if response is not None:
+            self._set_headers(200)
         self.wfile.write(json.dumps(response).encode())
 
     # Here's a method on the class that overrides the parent's method.
@@ -95,6 +106,7 @@ class HandleRequests(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(new_animal).encode())
         # Encode the new animal and send in response
         if resource == "locations":
+            # if new_location["name"] or new_location["address"] is None
             new_location = create_location(post_body)
             self.wfile.write(json.dumps(new_location).encode())
         if resource == "employees":
