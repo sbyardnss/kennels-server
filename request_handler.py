@@ -82,13 +82,13 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def do_POST(self):
         """function for posting new dictionaries"""
-        self._set_headers(201)
+        # self._set_headers(201)
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
-
+        # print(post_body) PRINTS b'{\n    "id": 1,\n    "name": "rover",\n    "species": "Dog",\n    "status": "Admitted",\n    "locationId": 1,\n    "customerId": 1\n}'
         # Convert JSON string to a Python dictionary
         post_body = json.loads(post_body)
-
+        response = {}
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
@@ -103,18 +103,27 @@ class HandleRequests(BaseHTTPRequestHandler):
         # function next.
         if resource == "animals":
             new_animal = create_animal(post_body)
-            self.wfile.write(json.dumps(new_animal).encode())
+            response = new_animal
         # Encode the new animal and send in response
         if resource == "locations":
-            # if new_location["name"] or new_location["address"] is None
-            new_location = create_location(post_body)
-            self.wfile.write(json.dumps(new_location).encode())
+            if "name" in post_body and "address" in post_body:
+                new_location = create_location(post_body)
+                response = new_location
+                self._set_headers(201)
+            else:
+                self._set_headers(400)
+                response = {
+                    "message": f'{"name is required" if "name" not in post_body else ""} {"address is required" if "address" not in post_body else ""}'}
         if resource == "employees":
             new_employee = create_employee(post_body)
-            self.wfile.write(json.dumps(new_employee).encode())
+            response = new_employee
+            self._set_headers(201)
         if resource == "customers":
             new_customer = create_customer(post_body)
-            self.wfile.write(json.dumps(new_customer).encode())
+            response = new_customer
+            self._set_headers(201)
+        self.wfile.write(json.dumps(response).encode())
+
     # A method that handles any PUT request.
 
     def do_PUT(self):
