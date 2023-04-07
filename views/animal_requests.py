@@ -1,5 +1,5 @@
 from .locations_requests import get_single_location
-from . customer_requests import get_single_customer
+from .customer_requests import get_single_customer
 
 ANIMALS = [
     {

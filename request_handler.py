@@ -9,6 +9,25 @@ from views import delete_employee, delete_customer, delete_location, update_anim
 # work together for a common purpose. In this case, that
 # common purpose is to respond to HTTP requests from a client.
 
+method_mapper = {
+    "animals": {
+        "all": get_all_animals,
+        "single": get_single_animal
+    },
+    "locations": {
+        "all": get_all_locations,
+        "single": get_single_location
+    },
+    "employees": {
+        "all": get_all_employees,
+        "single": get_single_employee
+    },
+    "customers": {
+        "all": get_all_customers,
+        "single": get_single_customer
+    }
+}
+
 
 class HandleRequests(BaseHTTPRequestHandler):
     # This is a Docstring it should be at the beginning of all classes and functions
@@ -21,72 +40,69 @@ class HandleRequests(BaseHTTPRequestHandler):
     # Here's a method on the class that overrides the parent's method.
     # It handles any GET request.
     def do_GET(self):
-        """Handles GET requests to the server
-        """
-        # Set the response code to 'Ok'
-        # self._set_headers(200)
-        response = {}  # Default response
-
-        # Parse the URL and capture the tuple that is returned
+        """Handles GET requests to the server"""
+        response = None
         (resource, id) = self.parse_url(self.path)
-        if resource == "animals":
-            if id is not None:
-                response = get_single_animal(id)
-            else:
-                response = get_all_animals()
-            if response is None:
-                self._set_headers(404)
-                response = {"message": f"Animal {id} is not found"}
-            else:
-                self._set_headers(200)
-        if resource == "locations":
-            if id is not None:
-                response = get_single_location(id)
-            else:
-                response = get_all_locations()
-            if response is None:
-                self._set_headers(404)
-                response = {"message": f"Location {id} is not found"}
-            else:
-                self._set_headers(200)
-        if resource == "customers":
-            if id is not None:
-                response = get_single_customer(id)
-            else:
-                response = get_all_customers()
-            if response is None:
-                self._set_headers(404)
-                response = {"message": f"Customer {id} is not found"}
-            else:
-                self._set_headers(200)
-        if resource == "employees":
-            if id is not None:
-                response = get_single_employee(id)
-            else:
-                response = get_all_employees()
-            if response is None:
-                self._set_headers(404)
-                response = {"message": f"Employee {id} is not found"}
-            else:
-                self._set_headers(200)
-        # if response is not None:
-        #     self._set_headers(200)
+        response = self.get_all_or_single(resource, id)
         self.wfile.write(json.dumps(response).encode())
+    def get_all_or_single(self, resource, id):
+        """function to direct method mapper"""
+        if id is not None:
+            response = method_mapper[resource]["single"](id)
+            if response is not None:
+                self._set_headers(200)
+            else:
+                self._set_headers(404)
+                response = ''
+        else:
+            self._set_headers(200)
+            response = method_mapper[resource]["all"]()
+        return response
+        # if resource == "animals":
+        #     if id is not None:
+        #         response = get_single_animal(id)
+        #     else:
+        #         response = get_all_animals()
+        #     if response is None:
+        #         self._set_headers(404)
+        #         response = {"message": f"Animal {id} is not found"}
+        #     else:
+        #         self._set_headers(200)
+        # if resource == "locations":
+        #     if id is not None:
+        #         response = get_single_location(id)
+        #     else:
+        #         response = get_all_locations()
+        #     if response is None:
+        #         self._set_headers(404)
+        #         response = {"message": f"Location {id} is not found"}
+        #     else:
+        #         self._set_headers(200)
+        # if resource == "customers":
+        #     if id is not None:
+        #         response = get_single_customer(id)
+        #     else:
+        #         response = get_all_customers()
+        #     if response is None:
+        #         self._set_headers(404)
+        #         response = {"message": f"Customer {id} is not found"}
+        #     else:
+        #         self._set_headers(200)
+        # if resource == "employees":
+        #     if id is not None:
+        #         response = get_single_employee(id)
+        #     else:
+        #         response = get_all_employees()
+        #     if response is None:
+        #         self._set_headers(404)
+        #         response = {"message": f"Employee {id} is not found"}
+        #     else:
+        #         self._set_headers(200)
+
+        # self.wfile.write(json.dumps(response).encode())
 
     # Here's a method on the class that overrides the parent's method.
     # It handles any POST request.
-
-    #  OLD POST FORMAT
-    # def do_POST(self):
-    #     """Handles POST requests to the server"""
-
-    #     # Set response code to 'Created'
-    #     self._set_headers(201)
-
-    #     content_len = int(self.headers.get('content-length', 0))
-    #     post_body = self.rfile.read(content_len)
-    #     response = {"payload": post_body}
-    #     self.wfile.write(json.dumps(response).encode())
 
     def do_POST(self):
         """function for posting new dictionaries"""
@@ -195,12 +211,14 @@ class HandleRequests(BaseHTTPRequestHandler):
         if resource == "customers":
             # delete_customer(id)
             self._set_headers(405)
-            response = {"message": "Deleting customers requires contacting the company directly"}
+            response = {
+                "message": "Deleting customers requires contacting the company directly"}
             self.wfile.write(json.dumps(response).encode())
         if resource == "employees":
             delete_employee(id)
             self._set_headers(204)
             self.wfile.write("".encode())
+
     def _set_headers(self, status):
         # Notice this Docstring also includes information about the arguments passed to the function
         """Sets the status code, Content-Type and Access-Control-Allow-Origin
