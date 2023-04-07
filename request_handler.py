@@ -102,8 +102,15 @@ class HandleRequests(BaseHTTPRequestHandler):
         # the orange squiggle, you'll define the create_animal
         # function next.
         if resource == "animals":
-            new_animal = create_animal(post_body)
-            response = new_animal
+            if "name" in post_body and "species" in post_body and "status" in post_body and "customerId" in post_body and "locationId" in post_body:
+                new_animal = create_animal(post_body)
+                response = new_animal
+                self._set_headers(201)
+            else:
+                self._set_headers(400)
+                response = {
+                    "message": f'{"name is required" if "name" not in post_body else ""} {"status is required" if "status" not in post_body else ""} {"customerId is required" if "customerId" not in post_body else ""} {"locationId is required" if "locationId" not in post_body else ""} {"species is required" if "species" not in post_body else ""}'
+                }
         # Encode the new animal and send in response
         if resource == "locations":
             if "name" in post_body and "address" in post_body:
@@ -115,13 +122,25 @@ class HandleRequests(BaseHTTPRequestHandler):
                 response = {
                     "message": f'{"name is required" if "name" not in post_body else ""} {"address is required" if "address" not in post_body else ""}'}
         if resource == "employees":
-            new_employee = create_employee(post_body)
-            response = new_employee
-            self._set_headers(201)
+            if "name" in post_body:
+                new_employee = create_employee(post_body)
+                response = new_employee
+                self._set_headers(201)
+            else:
+                self._set_headers(400)
+                response = {
+                    "message": "name is required"
+                }
         if resource == "customers":
-            new_customer = create_customer(post_body)
-            response = new_customer
-            self._set_headers(201)
+            if "name" in post_body:
+                new_customer = create_customer(post_body)
+                response = new_customer
+                self._set_headers(201)
+            else:
+                self._set_headers(400)
+                response = {
+                    "message": "name is required"
+                }
         self.wfile.write(json.dumps(response).encode())
 
     # A method that handles any PUT request.
