@@ -30,15 +30,8 @@ method_mapper = {
 
 
 class HandleRequests(BaseHTTPRequestHandler):
-    # This is a Docstring it should be at the beginning of all classes and functions
-    # It gives a description of the class or function
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
     """
-
-    # Here's a class function
-
-    # Here's a method on the class that overrides the parent's method.
-    # It handles any GET request.
     def do_GET(self):
         """Handles GET requests to the server"""
         response = None
@@ -58,51 +51,6 @@ class HandleRequests(BaseHTTPRequestHandler):
             self._set_headers(200)
             response = method_mapper[resource]["all"]()
         return response
-        # if resource == "animals":
-        #     if id is not None:
-        #         response = get_single_animal(id)
-        #     else:
-        #         response = get_all_animals()
-        #     if response is None:
-        #         self._set_headers(404)
-        #         response = {"message": f"Animal {id} is not found"}
-        #     else:
-        #         self._set_headers(200)
-        # if resource == "locations":
-        #     if id is not None:
-        #         response = get_single_location(id)
-        #     else:
-        #         response = get_all_locations()
-        #     if response is None:
-        #         self._set_headers(404)
-        #         response = {"message": f"Location {id} is not found"}
-        #     else:
-        #         self._set_headers(200)
-        # if resource == "customers":
-        #     if id is not None:
-        #         response = get_single_customer(id)
-        #     else:
-        #         response = get_all_customers()
-        #     if response is None:
-        #         self._set_headers(404)
-        #         response = {"message": f"Customer {id} is not found"}
-        #     else:
-        #         self._set_headers(200)
-        # if resource == "employees":
-        #     if id is not None:
-        #         response = get_single_employee(id)
-        #     else:
-        #         response = get_all_employees()
-        #     if response is None:
-        #         self._set_headers(404)
-        #         response = {"message": f"Employee {id} is not found"}
-        #     else:
-        #         self._set_headers(200)
-
-        # self.wfile.write(json.dumps(response).encode())
-
-    # Here's a method on the class that overrides the parent's method.
-    # It handles any POST request.
 
     def do_POST(self):
         """function for posting new dictionaries"""
