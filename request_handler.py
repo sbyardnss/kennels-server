@@ -40,9 +40,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         post_body = json.loads(post_body)
         response = {}
         (resource, id) = self.parse_url(self.path)
-
         new_asset = None
-
         if resource == "animals":
             if "name" in post_body and "species" in post_body and "status" in post_body and "customerId" in post_body and "locationId" in post_body:
                 new_asset = create(resource, post_body)

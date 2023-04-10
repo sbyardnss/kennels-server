@@ -89,16 +89,13 @@ def create(resource, resource_obj):
     """For POST requests to a collection"""
     max_id = DATABASE[resource][-1]["id"]
     new_id = max_id + 1
-    # required_attributes = DATABASE[resource][-1].keys
-    # print(required_attributes)
     resource_obj["id"] = new_id
-    # submitted_attributes = resource_obj.keys()
-    # print(submitted_attributes)
+    # required_attributes = retrieve(resource, 1).keys()
+    # print(required_attributes)
     # if required_attributes == submitted_attributes:
     DATABASE[resource].append(resource_obj)
     return resource_obj
     # else:
-        
 
 
 def update(resource, id, new_asset):
