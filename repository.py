@@ -87,19 +87,27 @@ def retrieve(resource, id):
 
 def create(resource, resource_obj):
     """For POST requests to a collection"""
-    max_id = resource[-1]["id"]
+    max_id = DATABASE[resource][-1]["id"]
     new_id = max_id + 1
+    # required_attributes = DATABASE[resource][-1].keys
+    # print(required_attributes)
     resource_obj["id"] = new_id
+    # submitted_attributes = resource_obj.keys()
+    # print(submitted_attributes)
+    # if required_attributes == submitted_attributes:
     DATABASE[resource].append(resource_obj)
     return resource_obj
+    # else:
+        
 
 
-def update(resource, new_asset, id):
+def update(resource, id, new_asset):
     """For PUT requests to a single resource"""
     for index, asset in enumerate(DATABASE[resource]):
         if asset["id"] == id:
             DATABASE[resource][index] = new_asset
             break
+
 
 def delete(resource, id):
     """For DELETE requests to a single resource"""
@@ -110,3 +118,6 @@ def delete(resource, id):
     if asset_index >= 0:
         DATABASE[resource].pop(asset_index)
 
+
+test_resource = DATABASE["animals"][-1]
+test = retrieve("animals", DATABASE["animals"][-1]["id"]).keys()
