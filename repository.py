@@ -66,14 +66,15 @@ DATABASE = {
 
 def all(resource):
     """For GET requests to collection"""
-    if resource == "animals":
-        return DATABASE["animals"]
-    if resource == "customers":
-        return DATABASE["customers"]
-    if resource == "employees":
-        return DATABASE["employees"]
-    if resource == "locations":
-        return DATABASE["locations"]
+    # if resource == "animals":
+    #     return DATABASE["animals"]
+    # if resource == "customers":
+    #     return DATABASE["customers"]
+    # if resource == "employees":
+    #     return DATABASE["employees"]
+    # if resource == "locations":
+    #     return DATABASE["locations"]
+    return DATABASE[resource]
 
 
 def retrieve(resource, id):
