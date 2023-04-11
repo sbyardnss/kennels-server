@@ -1,3 +1,6 @@
+import json
+import sqlite3
+from models import Location
 LOCATIONS = [
     {
         "id": 1,
@@ -13,18 +16,56 @@ LOCATIONS = [
 
 
 def get_all_locations():
-    """function for viewing all locations"""
-    return LOCATIONS
-
+    """sql get all locations"""
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+        db_cursor.execute("""
+        SELECT
+            a.id,
+            a.name,
+            a.address
+        FROM location a
+        """)
+        locations = []
+        dataset = db_cursor.fetchall()
+        for row in dataset:
+            location = Location(row['id'], row['name'], row['address'])
+            locations.append(location.__dict__)
+    return locations
 
 def get_single_location(id):
-    """function for getting individual location by id"""
-    requested_location = None
+    """sql single location fetch"""
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+        db_cursor.execute("""
+        SELECT
+            a.id,
+            a.name,
+            a.address
+        FROM location a
+        WHERE a.id = ?
+        """, ( id, ))
+        data = db_cursor.fetchone()
+        location = Location(data['id'], data['name'], data['address'])
+    return location.__dict__
 
-    for loc in LOCATIONS:
-        if loc["id"] == id:
-            requested_location = loc
-    return requested_location
+
+# OLD VERSIONS
+# def get_all_locations():
+#     """function for viewing all locations"""
+#     return LOCATIONS
+
+
+# def get_single_location(id):
+#     """function for getting individual location by id"""
+#     requested_location = None
+
+#     for loc in LOCATIONS:
+#         if loc["id"] == id:
+#             requested_location = loc
+#     return requested_location
 
 def create_location(location):
     """function for creating an location"""
@@ -43,6 +84,7 @@ def create_location(location):
     # Return the dictionary with `id` property added
     return location
 
+
 def delete_location(id):
     """function for deleting a location"""
     location_index = -1
@@ -51,6 +93,7 @@ def delete_location(id):
             location_index = index
     if location_index >= 0:
         LOCATIONS.pop(location_index)
+
 
 def update_location(id, new_location):
     """function for updating a location"""

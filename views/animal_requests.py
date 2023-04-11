@@ -31,6 +31,7 @@ ANIMALS = [
 
 def get_all_animals():
     # Open a connection to the database
+    """sql friendly function for getting all animals"""
     with sqlite3.connect("./kennel.sqlite3") as conn:
 
         # Just use these. It's a Black Box.
@@ -78,18 +79,50 @@ def get_all_animals():
 
 
 def get_single_animal(id):
-    """function for requesting single animal"""
-    # Variable to hold the found animal, if it exists
-    requested_animal = None
+    """sql get single animal"""
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
 
-    # Iterate the ANIMALS list above. Very similar to the
-    # for..of loops you used in JavaScript.
-    for animal in ANIMALS:
-        # Dictionaries in Python use [] notation to find a key
-        # instead of the dot notation that JavaScript used.
-        if animal["id"] == id:
-            requested_animal = animal
-    return requested_animal
+        # Use a ? parameter to inject a variable's value
+        # into the SQL statement.
+        db_cursor.execute("""
+        SELECT
+            a.id,
+            a.name,
+            a.breed,
+            a.status,
+            a.location_id,
+            a.customer_id
+        FROM animal a
+        WHERE a.id = ?
+        """, ( id, ))
+
+        # Load the single result into memory
+        data = db_cursor.fetchone()
+
+        # Create an animal instance from the current row
+        animal = Animal(data['id'], data['name'], data['breed'],
+                            data['status'], data['location_id'],
+                            data['customer_id'])
+
+        return animal.__dict__
+
+
+# OLD VERSION
+# def get_single_animal(id):
+#     """function for requesting single animal"""
+#     # Variable to hold the found animal, if it exists
+#     requested_animal = None
+
+#     # Iterate the ANIMALS list above. Very similar to the
+#     # for..of loops you used in JavaScript.
+#     for animal in ANIMALS:
+#         # Dictionaries in Python use [] notation to find a key
+#         # instead of the dot notation that JavaScript used.
+#         if animal["id"] == id:
+#             requested_animal = animal
+#     return requested_animal
 
 
 def create_animal(animal):
@@ -109,6 +142,7 @@ def create_animal(animal):
     # Return the dictionary with `id` property added
     return animal
 
+
 def delete_animal(id):
     """function for deleting an animal"""
     # Initial -1 value for animal index, in case one isn't found
@@ -124,6 +158,7 @@ def delete_animal(id):
     # If the animal was found, use pop(int) to remove it from list
     if animal_index >= 0:
         ANIMALS.pop(animal_index)
+
 
 def update_animal(id, new_animal):
     """function for updating animals"""
