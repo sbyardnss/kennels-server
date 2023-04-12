@@ -224,13 +224,35 @@ def delete_animal(id):
 #     if animal_index >= 0:
 #         ANIMALS.pop(animal_index)
 
-
 def update_animal(id, new_animal):
-    """function for updating animals"""
-    # Iterate the ANIMALS list, but use enumerate() so that
-    # you can access the index value of each item.
-    for index, animal in enumerate(ANIMALS):
-        if animal["id"] == id:
-            # Found the animal. Update the value.
-            ANIMALS[index] = new_animal
-            break
+    """sql function for updating animal"""
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
+        db_cursor.execute("""
+        UPDATE Animal
+            SET
+                name = ?,
+                breed = ?,
+                status = ?,
+                location_id = ?,
+                customer_id = ?
+        WHERE id = ?
+        """, (new_animal['name'], new_animal['breed'],
+              new_animal['status'], new_animal['location_id'],
+              new_animal['customer_id'], id, ))
+        rows_affected = db_cursor.rowcount
+    if rows_affected == 0:
+        return False
+    return True
+
+
+# OLD VERSION
+# def update_animal(id, new_animal):
+#     """function for updating animals"""
+#     # Iterate the ANIMALS list, but use enumerate() so that
+#     # you can access the index value of each item.
+#     for index, animal in enumerate(ANIMALS):
+#         if animal["id"] == id:
+#             # Found the animal. Update the value.
+#             ANIMALS[index] = new_animal
+#             break
