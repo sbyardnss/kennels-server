@@ -200,22 +200,40 @@ def get_animal_by_status(status):
 #     return requested_animal
 
 
-def create_animal(animal):
-    """function for creating an animal"""
-    # Get the id value of the last animal in the list
-    max_id = ANIMALS[-1]["id"]
+def create_animal(new_animal):
+    """sql function for creating animals"""
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
+        db_cursor.execute("""
+        INSERT INTO Animal
+            ( name, breed, status, location_id, customer_id )
+        VALUES
+            ( ?, ?, ?, ?, ?);
+        """, (new_animal['name'], new_animal['breed'],
+              new_animal['status'], new_animal['location_id'],
+              new_animal['customer_id'], ))
+        id= db_cursor.lastrowid
+        new_animal['id'] = id
+    return new_animal
 
-    # Add 1 to whatever that number is
-    new_id = max_id + 1
 
-    # Add an `id` property to the animal dictionary
-    animal["id"] = new_id
+# OLD VERSION
+# def create_animal(animal):
+#     """function for creating an animal"""
+#     # Get the id value of the last animal in the list
+#     max_id = ANIMALS[-1]["id"]
 
-    # Add the animal dictionary to the list
-    ANIMALS.append(animal)
+#     # Add 1 to whatever that number is
+#     new_id = max_id + 1
 
-    # Return the dictionary with `id` property added
-    return animal
+#     # Add an `id` property to the animal dictionary
+#     animal["id"] = new_id
+
+#     # Add the animal dictionary to the list
+#     ANIMALS.append(animal)
+
+#     # Return the dictionary with `id` property added
+#     return animal
 
 
 def delete_animal(id):
