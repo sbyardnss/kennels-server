@@ -73,3 +73,6 @@ FROM animal a
 WHERE a.id = 3
 
 INSERT INTO `Animal` VALUES (null, "Daps", "Kennel", "Boxer", 2, 2);
+
+DELETE FROM `Animal`
+WHERE id > 11;

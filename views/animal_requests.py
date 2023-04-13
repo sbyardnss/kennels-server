@@ -212,7 +212,7 @@ def create_animal(new_animal):
         """, (new_animal['name'], new_animal['breed'],
               new_animal['status'], new_animal['location_id'],
               new_animal['customer_id'], ))
-        id= db_cursor.lastrowid
+        id = db_cursor.lastrowid
         new_animal['id'] = id
     return new_animal
 

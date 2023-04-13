@@ -31,7 +31,8 @@ def get_all_employees():
         for row in dataset:
             employee = Employee(row['id'], row['name'],
                                 row['address'], row['location_id'])
-            location = Location(row['location_id'], row['location_name'], row['location_address'])
+            location = Location(
+                row['location_id'], row['location_name'], row['location_address'])
             employee.location = location.__dict__
             employees.append(employee.__dict__)
     return employees
@@ -70,7 +71,7 @@ def get_employee_by_location(location):
             e.location_id
         FROM employee e
         WHERE e.location_id = ?
-        """, ( location, ))
+        """, (location, ))
         dataset = db_cursor.fetchall()
         employees = []
         for row in dataset:
@@ -93,22 +94,37 @@ def get_employee_by_location(location):
 #             requested_employee = employee
 #     return requested_employee
 
-def create_employee(employee):
-    """function for adding an employee to the database"""
-    # Get the id value of the last employee in the list
-    max_id = EMPLOYEES[-1]["id"]
+def create_employee(new_employee):
+    """sql function for employee post"""
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
+        db_cursor.execute("""
+        INSERT INTO Employee
+            ( name, address, location_id )
+        VALUES
+            ( ?, ?, ?);
+        """, (new_employee['name'], new_employee['address'], new_employee['location_id']))
+        id = db_cursor.lastrowid
+        new_employee['id'] = id
+    return new_employee
+# OLD VERSION
+# def create_employee(employee):
+#     """function for adding an employee to the database"""
+#     # Get the id value of the last employee in the list
+#     max_id = EMPLOYEES[-1]["id"]
 
-    # Add 1 to whatever that number is
-    new_id = max_id + 1
+#     # Add 1 to whatever that number is
+#     new_id = max_id + 1
 
-    # Add an `id` property to the employee dictionary
-    employee["id"] = new_id
+#     # Add an `id` property to the employee dictionary
+#     employee["id"] = new_id
 
-    # Add the employee dictionary to the list
-    EMPLOYEES.append(employee)
+#     # Add the employee dictionary to the list
+#     EMPLOYEES.append(employee)
 
-    # Return the dictionary with `id` property added
-    return employee
+#     # Return the dictionary with `id` property added
+#     return employee
+
 
 def delete_employee(id):
     """function for deleting an employee"""
@@ -118,6 +134,7 @@ def delete_employee(id):
             employee_index = index
     if employee_index >= 0:
         EMPLOYEES.pop(employee_index)
+
 
 def update_employee(id, new_employee):
     """function for updating a employee"""
