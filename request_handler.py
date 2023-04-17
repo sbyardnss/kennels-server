@@ -31,7 +31,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Parse the URL and capture the tuple that is returned
         parsed = self.parse_url(self.path)
         if '?' not in self.path:
-            (resource, id) = parsed
+            (resource, id, query) = parsed
             if resource == "animals":
                 if id is not None:
                     response = get_single_animal(id)
@@ -53,7 +53,7 @@ class HandleRequests(BaseHTTPRequestHandler):
                 else:
                     response = get_all_employees()
         else:
-            (resource, query) = parsed
+            (resource, id, query) = parsed
             if query.get('email') and resource == 'customers':
                 response = get_customer_by_email(query['email'][0])
             if query.get('location_id') and resource == 'employees':
@@ -89,7 +89,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         post_body = json.loads(post_body)
 
         # Parse the URL
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query) = self.parse_url(self.path)
 
         # Initialize new animal
         new_animal = None
@@ -122,7 +122,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         post_body = json.loads(post_body)
 
         # Parse the URL
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query) = self.parse_url(self.path)
 
         success = False
 
@@ -165,7 +165,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         self._set_headers(204)
 
         # Parse the URL
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query) = self.parse_url(self.path)
 
         # Delete a single animal from the list
         if resource == "animals":
@@ -211,20 +211,38 @@ class HandleRequests(BaseHTTPRequestHandler):
     # add this import to the top of the file
 
    # replace the parse_url function in the class
+
     def parse_url(self, path):
-        """parse the url into the resource and id"""
-        parsed_url = urlparse(path)
-        path_params = parsed_url.path.split('/')  # ['', 'animals', 1]
-        resource = path_params[1]
-        if parsed_url.query:
-            query = parse_qs(parsed_url.query)
-            return (resource, query)
-        pk = None
-        try:
-            pk = int(path_params[2])
-        except (IndexError, ValueError):
-            pass
-        return (resource, pk)
+        """new url parse for param requests"""
+        url_components = urlparse(path)
+        path_params = url_components.path.strip("/").split("/")
+        query_params = []
+        if url_components.query != '':
+            query_params = url_components.query.split("&")
+            resource = path_params[0]
+            id = None
+            try:
+                id = int(path_params[1])
+            except IndexError:
+                pass
+            except ValueError:
+                pass
+            return (resource, id, query_params)
+
+    # def parse_url(self, path):
+    #     """parse the url into the resource and id"""
+    #     parsed_url = urlparse(path)
+    #     path_params = parsed_url.path.split('/')  # ['', 'animals', 1]
+    #     resource = path_params[1]
+    #     if parsed_url.query:
+    #         query = parse_qs(parsed_url.query)
+    #         return (resource, query)
+    #     pk = None
+    #     try:
+    #         pk = int(path_params[2])
+    #     except (IndexError, ValueError):
+    #         pass
+    #     return (resource, pk)
     # OLD VERSION BEFORE PARAM LESSON
     # def parse_url(self, path):
     #     """turns url for requested animal into tuple"""
