@@ -28,7 +28,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         response = {}  # Default response
 
         # Parse the URL and capture the tuple that is returned
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query_params) = self.parse_url(self.path)
         if resource == "animals":
             if id is not None:
                 response = get_single_animal(id)
@@ -98,7 +98,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         post_body = json.loads(post_body)
         response = {}
         # Parse the URL
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query_params) = self.parse_url(self.path)
 
         # Initialize new animal
         new_animal = None
@@ -160,7 +160,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query_params) = self.parse_url(self.path)
         if resource == "animals":
             update_animal(id, post_body)
             self.wfile.write("".encode())
@@ -180,7 +180,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         # self._set_headers(204)
 
         # Parse the URL
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query_params) = self.parse_url(self.path)
 
         # Delete a single animal from the list
         if resource == "animals":
@@ -195,12 +195,14 @@ class HandleRequests(BaseHTTPRequestHandler):
         if resource == "customers":
             # delete_customer(id)
             self._set_headers(405)
-            response = {"message": "Deleting customers requires contacting the company directly"}
+            response = {
+                "message": "Deleting customers requires contacting the company directly"}
             self.wfile.write(json.dumps(response).encode())
         if resource == "employees":
             delete_employee(id)
             self._set_headers(204)
             self.wfile.write("".encode())
+
     def _set_headers(self, status):
         # Notice this Docstring also includes information about the arguments passed to the function
         """Sets the status code, Content-Type and Access-Control-Allow-Origin
@@ -227,26 +229,43 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.end_headers()
 
     def parse_url(self, path):
-        """turns url for requested animal into tuple"""
-        # Just like splitting a string in JavaScript. If the
-        # path is "/animals/1", the resulting list will
-        # have "" at index 0, "animals" at index 1, and "1"
-        # at index 2.
-        path_params = path.split("/")
-        resource = path_params[1]
-        id = None
+        """new url parse for param requests"""
+        url_components = urlparse(path)
+        path_params = url_components.path.strip("/").split("/")
+        query_params = []
+        if url_components.query != '':
+            query_params = url_components.query.split("&")
+            resource = path_params[0]
+            id = None
+            try:
+                id = int(path_params[1])
+            except IndexError:
+                pass
+            except ValueError:
+                pass
+            return (resource, id, query_params)
+    # OLD VERSION
+    # def parse_url(self, path):
+    #     """turns url for requested animal into tuple"""
+    #     # Just like splitting a string in JavaScript. If the
+    #     # path is "/animals/1", the resulting list will
+    #     # have "" at index 0, "animals" at index 1, and "1"
+    #     # at index 2.
+    #     path_params = path.split("/")
+    #     resource = path_params[1]
+    #     id = None
 
-        # Try to get the item at index 2
-        try:
-            # Convert the string "1" to the integer 1
-            # This is the new parseInt()
-            id = int(path_params[2])
-        except IndexError:
-            pass  # No route parameter exists: /animals
-        except ValueError:
-            pass  # Request had trailing slash: /animals/
+    #     # Try to get the item at index 2
+    #     try:
+    #         # Convert the string "1" to the integer 1
+    #         # This is the new parseInt()
+    #         id = int(path_params[2])
+    #     except IndexError:
+    #         pass  # No route parameter exists: /animals
+    #     except ValueError:
+    #         pass  # Request had trailing slash: /animals/
 
-        return (resource, id)  # This is a tuple
+    #     return (resource, id)  # This is a tuple
 
 
 # This function is not inside the class. It is the starting
