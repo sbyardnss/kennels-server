@@ -1,4 +1,5 @@
 import json
+from urllib.parse import urlparse
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from views import get_all_animals, get_single_animal, get_single_location, get_all_locations
 from views import get_single_customer, get_all_customers, get_all_employees, get_single_employee
@@ -33,7 +34,7 @@ class HandleRequests(BaseHTTPRequestHandler):
             if id is not None:
                 response = get_single_animal(id)
             else:
-                response = get_all_animals()
+                response = get_all_animals(query_params)
             if response is None:
                 self._set_headers(404)
                 response = {"message": f"Animal {id} is not found"}
