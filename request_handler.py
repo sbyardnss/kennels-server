@@ -1,5 +1,5 @@
 import json
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from views import get_all_animals, get_single_animal, get_single_location, get_all_locations
 from views import get_single_customer, get_all_customers, get_all_employees, get_single_employee
@@ -29,6 +29,10 @@ class HandleRequests(BaseHTTPRequestHandler):
         response = {}  # Default response
 
         # Parse the URL and capture the tuple that is returned
+
+        # NEW ATTEMPT
+
+        print(self.parse_url(self.path))
         (resource, id, query_params) = self.parse_url(self.path)
         if resource == "animals":
             if id is not None:
@@ -235,16 +239,16 @@ class HandleRequests(BaseHTTPRequestHandler):
         path_params = url_components.path.strip("/").split("/")
         query_params = []
         if url_components.query != '':
-            query_params = url_components.query.split("&")
-            resource = path_params[0]
-            id = None
-            try:
-                id = int(path_params[1])
-            except IndexError:
-                pass
-            except ValueError:
-                pass
-            return (resource, id, query_params)
+            query_params = parse_qs(url_components.query)
+        resource = path_params[0]
+        id = None
+        try:
+            id = int(path_params[1])
+        except IndexError:
+            pass
+        except ValueError:
+            pass
+        return (resource, id, query_params)
     # OLD VERSION
     # def parse_url(self, path):
     #     """turns url for requested animal into tuple"""

@@ -60,3 +60,27 @@ INSERT INTO `Animal` VALUES (null, "Daps", "Kennel", "Boxer", 2, 2);
 INSERT INTO `Animal` VALUES (null, "Cleo", "Kennel", "Poodle", 2, 2);
 INSERT INTO `Animal` VALUES (null, "Popcorn", "Kennel", "Beagle", 3, 2);
 INSERT INTO `Animal` VALUES (null, "Curly", "Treatment", "Poodle", 4, 2);
+
+SELECT * FROM Animal
+WHERE status = "Recreation"
+
+SELECT 
+    l.id,
+	l.name,
+	l.address,
+	(
+	SELECT COUNT(*)
+	FROM ANIMAL AS a 
+	WHERE a.location_id = l.id
+	) count
+FROM LOCATION as l
+
+
+SELECT 
+            l.id,
+            l.name,
+            l.address,
+            COUNT (*) as animals
+        FROM LOCATION as l
+        JOIN animal a ON a.location_id = l.id
+        GROUP BY a.location_id
