@@ -32,7 +32,6 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         # NEW ATTEMPT
 
-        print(self.parse_url(self.path))
         (resource, id, query_params) = self.parse_url(self.path)
         if resource == "animals":
             if id is not None:
@@ -239,7 +238,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         path_params = url_components.path.strip("/").split("/")
         query_params = []
         if url_components.query != '':
-            query_params = parse_qs(url_components.query)
+            query_params= parse_qs(url_components.query)
         resource = path_params[0]
         id = None
         try:

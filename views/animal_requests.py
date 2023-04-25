@@ -40,22 +40,36 @@ def get_all_animals(query):
 
         sort_by = ""
         where_clause = ""
-
         if len(query) != 0:
-            param = query[0]
-            [qs_key, qs_value] = param.split("=")
-            if qs_key == "_sortBy":
-                if qs_value == 'location':
-                    sort_by = " ORDER BY location_id"
-                if qs_value == "customer":
-                    sort_by = " ORDER BY customer_id"
-                if qs_value == "status":
+            # param = query[0]
+            
+            # [qs_key, qs_value] = param.split("=")
+            # if qs_key == "_sortBy":
+            #     if qs_value[0] == 'location':
+            #         sort_by = " ORDER BY location_id"
+            #     if qs_value[0] == "customer":
+            #         sort_by = " ORDER BY customer_id"
+            #     if qs_value[0] == 'status':
+            #         sort_by = " ORDER BY a.status desc"
+            #     if qs_value[0] == "name":
+            #         sort_by = " ORDER BY a.name"
+            # if qs_key == "locationId":
+            #     where_clause = f"WHERE l.id = {qs_value}"
+            # if qs_key == "status":
+            #     where_clause = f"WHERE a.status = '{qs_value}'"
+            if query.get("_sortBy"):
+                if query['_sortBy'][0] == 'status':
                     sort_by = " ORDER BY a.status"
-            if qs_key == "locationId":
-                where_clause = f"WHERE l.id = {qs_value}"
-            if qs_key == "status":
-                
-                where_clause = f"WHERE a.status = '{qs_value}'"
+                if query['_sortBy'][0] == 'location':
+                    sort_by = " ORDER BY location_id"
+                if query['_sortBy'][0] == 'customer':
+                    sort_by = " ORDER BY customer_id"
+                if query['_sortBy'][0] == 'name':
+                    sort_by = " ORDER BY a.name"
+            if query.get("locationId"):
+                where_clause = f"WHERE l.id = '{query['locationId'][0]}'"
+            if query.get("status"):
+                where_clause = f"WHERE a.status = '{query['status'][0]}'"
         # Write the SQL query to get the information you want
         sql_to_execute = f"""
             SELECT
